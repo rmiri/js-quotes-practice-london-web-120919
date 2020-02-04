@@ -112,18 +112,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const urlLikes = "http://localhost:3000/likes";
 
-    // function fetchLikes() {
-    //     fetch(urlLikes)
-    //     .then(response => response.json())
-    // }
-
-    // function eachLike(json){
-    //     for(let like of json){
-    //         //quote-id-${quote.id}
-    //         const spanQuote = document.getElementById(like.quoteId)
-    //         ++spanQuote.innerText
-    //     }
-    // }
 
     function newLike(quote,newLikeObject){
         return fetch(urlLikes, {
