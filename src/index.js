@@ -42,7 +42,8 @@ document.addEventListener("DOMContentLoaded", function() {
         buttonLike.innerText = `Likes: `
 
         const span = document.createElement('span')
-        span.innerText = 0
+        span.innerText = quote.likes.length
+
 
         const buttonDelete = document.createElement('button')
         buttonDelete.classList = 'btn-danger'
@@ -56,7 +57,16 @@ document.addEventListener("DOMContentLoaded", function() {
         buttonDelete.addEventListener('click', function(e) {
             destroyQuote(quote) 
             .then(li.remove())
-        })
+        });
+
+        buttonLike.addEventListener('click', function(e) {
+            const newLikeObject ={
+                quoteId: quote.id,
+                createdAt: Date.now()
+            }
+            newLike(quote,newLikeObject)
+            .then(++span.innerText)
+        } )
     }
 
     //Get the form object
@@ -96,6 +106,35 @@ document.addEventListener("DOMContentLoaded", function() {
             method: "DELETE"
         })
         .then(response =>response.json())
+    }
+
+    //////////////////// likes ////////////////////
+
+    const urlLikes = "http://localhost:3000/likes";
+
+    // function fetchLikes() {
+    //     fetch(urlLikes)
+    //     .then(response => response.json())
+    // }
+
+    // function eachLike(json){
+    //     for(let like of json){
+    //         //quote-id-${quote.id}
+    //         const spanQuote = document.getElementById(like.quoteId)
+    //         ++spanQuote.innerText
+    //     }
+    // }
+
+    function newLike(quote,newLikeObject){
+        return fetch(urlLikes, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+              },
+            body: JSON.stringify(newLikeObject)
+        }) //end of fetch
+        .then(response => response.json())
     }
    
 
