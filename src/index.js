@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const newQuoteForm = document.getElementById("new-quote-form");
 
+    
+
     //add a fetch
 
     function fetchQuotes() {
@@ -38,19 +40,37 @@ document.addEventListener("DOMContentLoaded", function() {
         const br = document.createElement('br')
 
         const buttonLike = document.createElement('button')
-        buttonLike.classList = 'btn-success'
-        buttonLike.innerText = `Likes: `
+        buttonLike.classList = 'btn btn-success'
+        buttonLike.innerText = `❤️ Likes: `
 
         const span = document.createElement('span')
-        span.innerText = quote.likes.length
+        quote.likes? span.innerText = quote.likes.length : span.innerText = 0;
 
 
         const buttonDelete = document.createElement('button')
-        buttonDelete.classList = 'btn-danger'
+        buttonDelete.classList = 'btn btn-danger'
         buttonDelete.innerHTML = `Delete`
 
+        const buttonEdit = document.createElement('button')
+        buttonEdit.classList = 'btn btn-light'
+        buttonEdit.innerHTML = `Edit 🖊 `
+
+        let editQuoteBtn = false;
+        
+        buttonEdit.addEventListener("click", (e) => {
+            // debugger
+            // console.log(e.target)
+            const form = e.target.parentElement.parentElement.querySelector('form')
+            editQuoteBtn = !editQuoteBtn;
+            if (editQuoteBtn) {
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
+        })
+
         buttonLike.append(span)
-        blockquote.append(p,footer,br,buttonLike,buttonDelete)
+        blockquote.append(p,footer,br,buttonLike,buttonDelete,buttonEdit)
         li.append(blockquote)
         quoteList.append(li)
 
@@ -67,6 +87,11 @@ document.addEventListener("DOMContentLoaded", function() {
             newLike(quote,newLikeObject)
             .then(++span.innerText)
         } )
+
+
+        //edit form
+        createAForm(quote, li)
+
     }
 
     //Get the form object
@@ -84,6 +109,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
         createQuote(quoteNew)
         .then(renderQuote)
+
+        e.target.reset()
 
     }); //end of form listener
 
@@ -124,8 +151,62 @@ document.addEventListener("DOMContentLoaded", function() {
         }) //end of fetch
         .then(response => response.json())
     }
-   
 
+    ////////////////// FORM //////////////////////////////
+   
+    function createAForm(quote, li){
+
+        const form = document.createElement('form')
+        form.id = "edit"
+        form.style.display = "none";
+
+        const quoteInput = document.createElement('input')
+        quoteInput.name = "quote"
+        quoteInput.value = quote.quote;
+        quoteInput.classList = "form-control form-control-sm"
+
+        const authorInput = document.createElement('input')
+        authorInput.name = "author";
+        authorInput.value = quote.author;
+        authorInput.classList = "form-control form-control-sm"
+
+        const editButton = document.createElement('button')
+        editButton.innerText = "Edit"
+        editButton.classList = "btn btn-secondary"
+    
+
+        form.append(quoteInput, authorInput, editButton)
+        li.append(form)
+
+        form.addEventListener('submit',function(e){
+            e.preventDefault()
+
+            const quotId = quote.id
+
+            const newQuote = quoteInput.value;
+            const author = authorInput.value;
+    
+            const quoteNew = {
+                quote: newQuote,
+                author: author
+            }
+    
+            editQuote(quoteNew, quotId)
+            .then(quote => renderQuote(quote))
+        } )
+    }
+
+    function editQuote(quoteNew,quotId) {
+        return fetch('http://localhost:3000/quotes' + `/${quotId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+              },
+            body: JSON.stringify(quoteNew)
+        }) //end of fetch
+        .then(response => response.json())
+    }
 
 
 
